@@ -6,11 +6,12 @@ const videoInput = document.querySelector('#videoFile');
 const video = document.querySelector('#video');
 const textArea = document.querySelector('#textArea');
 const status = document.querySelector('#status');
+
 const reactTime = 0.4;
 let subTexts = [];
 let currentStamping = 0;
 let lines = [];
-
+//normalize the lines to 0
 function clamp(num) {
   return Math.max(num, 0);
 }
@@ -22,7 +23,7 @@ const keyMap = {
     }
 
     lines[currentStamping + 1][0] = clamp(video.currentTime - reactTime);
-    if (lines[currentStamping][1] > video.currentTime - reactTime || lines[currentStamping][1] === null){
+    if (lines[currentStamping][1] > video.currentTime - reactTime || lines[currentStamping][1] === null) {
       lines[currentStamping][1] = clamp(video.currentTime - 0.03 - reactTime);
     }
 
@@ -50,7 +51,7 @@ function getCurrentStatus() {
 }
 
 function execHotkey(keyMap) {
-  document.addEventListener('keypress', function(e) {
+  document.addEventListener('keypress', function (e) {
     const execFn = keyMap[e.key.toLowerCase()];
     if (typeof execFn === 'function') {
       execFn(video);
@@ -60,7 +61,7 @@ function execHotkey(keyMap) {
 }
 
 function updateContent() {
-  const head = '** 目前 ---> ';
+  const head = '** Current ---> ';
 
   const content = subTexts
     .slice(currentStamping, currentStamping + 5)
@@ -79,10 +80,10 @@ function handleFileUpload(e) {
     const file = e.target.files[0];
 
     /*
-      if it's srt file, fill text area with srt content
-      if it's video, load it into video tag
+    if it's srt file, fill text area with srt content
+    if it's video, load it into video tag
     */
-    reader.onload = function() {
+    reader.onload = function () {
       if (e.target.id === SRT_ID) {
         subTexts = reader.result.split('\n');
         subTexts.forEach((_, i) => (lines[i] = [null, null]));
@@ -94,8 +95,8 @@ function handleFileUpload(e) {
       }
     };
 
-    reader.onerror = function() {
-      alert('無法讀取檔案！');
+    reader.onerror = function () {
+      alert('"Unable to read file"！');
     };
 
     if (e.target.id === SRT_ID) {
@@ -109,10 +110,14 @@ function handleFileUpload(e) {
 videoInput.addEventListener('change', handleFileUpload);
 srtInput.addEventListener('change', handleFileUpload);
 
-video.addEventListener('timeupdate', function(e) {
+video.addEventListener('timeupdate', function (e) {
   status.textContent = getCurrentStatus();
+  if (currentStamping >= lines.length) {
+    return;
+  }
 });
-
+// this function make srt with the subTexts and lines:
+//receive: [[start, end], [start, end]] and["Hello, world!"]
 function makeSRT() {
   srt = '';
   for (let i = 0; i < subTexts.length; i++) {
@@ -121,13 +126,16 @@ function makeSRT() {
     // line time
     let sh, sm, ss, sms;
     let eh, em, es, ems;
+
     const [timeStart, timeEnd] = lines[i];
     const leftPad = str => `${str}`.padStart(2, '0');
     const leftPad3 = str => `${str}`.padStart(3, '0');
+
     sh = leftPad(Math.floor(timeStart / 3600));
     sm = leftPad(Math.floor((timeStart % 3600) / 60));
     ss = leftPad(Math.floor(timeStart % 60));
     sms = leftPad3(Math.floor((timeStart * 1000) % 1000));
+
     eh = leftPad(Math.floor(timeEnd / 3600));
     em = leftPad(Math.floor((timeEnd % 3600) / 60));
     es = leftPad(Math.floor(timeEnd % 60));
@@ -137,15 +145,30 @@ function makeSRT() {
     srt += subTexts[i];
     srt += '\n\n';
   }
+
   console.log(srt);
-  let blob = new Blob([srt], {
-    type: 'text/plain;charset=utf-8'
-  });
+
   const a = document.createElement('a');
   const file = new Blob([srt], { type: 'text/plain;charset=utf-8' });
+
   a.href = URL.createObjectURL(file);
-  a.download = 'srt.txt';
+  a.download = 'untitle.txt';
   a.click();
   URL.revokeObjectURL(a.href);
   a.remove();
 }
+
+const subTexts2 = [
+  "Hello, world!",
+  "This is a subtitle.",
+  "It really works!"
+];
+
+const lines2 = [
+  [0.5, 2.7],  // start in 0.5s, finish in 2.7s
+  [3.0, 5.0],
+  [5.5, 7.0]
+];
+
+const srtConversionResult = makeSRT(subTexts2, lines2);
+console.log(srtConversionResult);

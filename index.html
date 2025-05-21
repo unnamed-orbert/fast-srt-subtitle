@@ -1,9 +1,8 @@
+<!DOCTYPE html>
 <html>
-  <title>Fast and Dirty Captioner</title>
-
   <head>
+    <title>Fast and Dirty Captioner</title>
     <meta charset="UTF-8" />
-
     <style>
       .video {
         width: 960px;
@@ -12,35 +11,32 @@
   </head>
 
   <body>
-    <p>選取字幕檔以及影片檔案開始製作 SRT！</p>
+    <p>Select subtitle and video files to start creating SRT!</p>
     <label>
-      <span>選擇字幕檔案：</span>
+      <span>Select subtitle file:</span>
       <input
         id="srtFile"
         type="file"
         name="srtFile"
-        placeholder="點擊上傳字幕檔"
-      />
+        placeholder="點擊上傳字幕檔" />
     </label>
     <label>
-      <span>選擇影片檔案：</span>
+      <span>Select video file:</span>
       <input
         id="videoFile"
         type="file"
         name="videoFile"
-        placeholder="點擊上傳影片檔"
-      />
+        placeholder="點擊上傳影片檔" />
     </label>
-    <p>
-      K: 下一行開始 | L: 這一行提前結束 | I: 前捲一行 | O: 後捲一行 | U: 倒帶 2
-      秒 | P: 前進 2 秒 | Q: 製作 SRT 檔
+    <p>K: Start next line | L: End this line early | I: Scroll one line forward | O: Scroll one line backward | U: Rewind 2
+      Seconds | P: Forward 2 seconds | Q: Create SRT file
     </p>
     <p>
       K: Next Line | L: This Line Ends Early | I: Scroll Back | O: Scroll
       Forward | U: Rewind | P: Forward | Q: Make SRT File
     </p>
     <p id="status">Test Text.</p>
-    <textarea id="textArea" rows="10" cols="80">預設的字。</textarea>
+    <textarea id="textArea" rows="10" cols="80">Default text.</textarea>
     <video class="video" id="video" controls></video>
   </body>
   <script src="main.js"></script>
